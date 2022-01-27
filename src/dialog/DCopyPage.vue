@@ -257,7 +257,7 @@ export default {
                 needLoading: false,
                 data: {
                   ...res.data.data,
-                  key: me.form.keypre + '-' + me.form.lang,
+                  key: me.form.keypre + 'LanG' + me.form.lang,
                 },
               }).then(() => {
                 this.ema.fire('projects_cdoc.pageAddSuccess')

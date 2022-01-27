@@ -201,8 +201,8 @@ export default {
     productListP() {
       return this.productList.map((i) => ({
         ...i,
-        keypre: i.key.split('-')[0],
-        lang: i.key.split('-')[1],
+        keypre: i.key.split('LanG')[0],
+        lang: i.key.split('LanG')[1] || 'zh',
       }))
     },
     productListPFilterByZh() {

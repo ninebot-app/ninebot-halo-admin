@@ -217,7 +217,7 @@ export default {
                 needLoading: false,
                 data: {
                   ...res.data.data,
-                  key: res.data.data.key + '-zh',
+                  key: res.data.data.key.replace('LanG', '') + 'LanGzh',
                 },
               }).then(() => {
                 this.ema.fire('projects_cdoc.pageAddSuccess')
