@@ -10,4 +10,3 @@ converage
 yarn-error.log
 npm-debug.log
 .yarnclean
-src/config/docker.js
