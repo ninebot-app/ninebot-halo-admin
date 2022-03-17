@@ -27,7 +27,7 @@ export default {
     this.$options.initPageTitle()
     // 更新页面定位信息
     this.$store.dispatch('changeActiveIndex', this.$options.name)
-    console.info('当前页面', this.$options.name)
+    console.info('1111当前页面', this.$options.name)
   },
   // 组件更新之前
   beforeUpdate: function () {
