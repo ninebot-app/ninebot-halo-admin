@@ -10,9 +10,6 @@
           <i class="ifont icon-empty"></i>
           <span>暂无页面信息，请先添加页面</span>
         </div>
-        <h3 class="blank-state-title">
-          <el-button @click="newApi" type="primary">添加页面</el-button>
-        </h3>
       </div>
       <el-alert class="tipWarp" title="项目介绍" type="info">
         <div v-html="projectMd"></div>
@@ -28,23 +25,8 @@
           <el-table-column label="更新时间" prop="updateTime"></el-table-column>
           <el-table-column fixed="right" label="操作">
             <template slot-scope="scope">
-              <el-button @click="copy(scope.row)" type="text" size="small"
-                >复制</el-button
-              >
-              <el-button type="text" size="small" @click="open(scope.row)"
-                >编辑</el-button
-              >
-              <el-button type="text" size="small" @click="preview(scope.row)"
-                >预览</el-button
-              >
-              <el-button type="text" size="small" @click="setting(scope.row)"
-                >设置</el-button
-              >
-              <el-button type="text" size="small" @click="delet(scope.row)"
-                >删除</el-button
-              >
-              <el-button type="text" size="small" @click="refreshComponent(scope.row)"
-                >更新最新组件</el-button
+              <el-button type="text" size="small" @click="changeStatus(scope.row)"
+                >启用</el-button
               >
             </template>
           </el-table-column>
@@ -65,83 +47,6 @@
           prop="createTime"
         ></el-table-column>
       </el-table>
-      <div
-        v-if="false"
-        class="boxSize"
-        v-for="(item, k) in productList"
-        :key="k"
-      >
-        <div class="status">
-          <span
-            class="ribbon"
-            v-bind:style="{
-              backgroundColor: item.status == 1 ? '#86C23A' : '#f89300',
-            }"
-            >{{ item.status == 1 ? '启用' : '禁用' }}</span
-          >
-        </div>
-        <div class="sourceKey" v-show="0">
-          {{ $route.query.key + '/' + item.key }}
-        </div>
-        <div class="sourceImg">
-          <img
-            :src="
-              item.image ||
-              'https://ymm-maliang.oss-cn-hangzhou.aliyuncs.com/ymm-maliang/access/ymm1562307855048.png'
-            "
-            class="logo"
-          />
-        </div>
-        <div class="sourceName">{{ item.name }}</div>
-        <div class="bottom">
-          <a class="qr">
-            <div class="qrBox">
-              <i class="eqf-QRcode"></i>
-            </div>
-            <a
-              :title="item.desc"
-              style="display: inline-block; cursor: pointer"
-              :href="getUrl(item, true)"
-              target="_blank"
-              class="erCode"
-            >
-              <img class="qrcode" :src="getqrUrl(item)" alt="" />
-            </a>
-          </a>
-          <div class="sourceButton">
-            <a class="editButton" :href="getUrl(item)" target="_blank">编辑</a>
-            <a class="editButton act_btn" target="_blank"
-              >操作
-              <div class="actions">
-                <p class="action" @click="setting(item)">设置</p>
-                <p class="action" @click="copy(item)">复制</p>
-                <p
-                  class="action"
-                  v-if="item.status == 1"
-                  @click="changeStatus(item)"
-                >
-                  禁用
-                </p>
-                <p
-                  class="action"
-                  v-if="item.status == 2"
-                  @click="changeStatus(item)"
-                >
-                  启用
-                </p>
-                <p
-                  class="action dele"
-                  @click="delet(item)"
-                  v-show="item.status == 1"
-                >
-                  删除
-                </p>
-                <p class="last"></p>
-              </div>
-            </a>
-          </div>
-        </div>
-      </div>
     </div>
     <!--页面列表信息/-->
   </div>
@@ -157,12 +62,12 @@ var projectMd = require('src/assets/tip/help/project.md')
 export default {
   mixins: [BasePage],
   components: {},
-  name: 'projects_cdoc',
+  name: 'projects_deldoc',
   props: {
     id: {
       // 项目id
       type: String,
-    },
+    }
   },
   data() {
     return {
@@ -196,7 +101,6 @@ export default {
     this.bindEvent('pageAddSuccess', () => {
       this.detailInfo()
     })
-    this.componentInfosFn()
   },
   computed: {
     hasData: function (list) {
@@ -217,88 +121,6 @@ export default {
     },
   },
   methods: {
-    componentInfosFn () {
-      Server({
-        url: 'component/searchByName',
-        method: 'post', // default
-        needLoading: false,
-        data: {
-          tags: this.selectedTags,
-          type: '0',
-          name: '',
-          onlyMine: false
-        }
-      }).then(({data}) => {
-        this.comLists = data.data && data.data.list || []
-        sessionStorage.setItem('componentInfos', JSON.stringify(this.comLists))
-      })
-    },
-    async refreshComponent (row) {
-      console.log(6644444, row)
-      let componentInfos = JSON.parse(sessionStorage.getItem('componentInfos'))
-      let content = JSON.parse(row.content)
-      let newChild = content.child.map(item => {
-        let obj = {}
-        componentInfos.forEach(val => {
-          if (item.type === val.name) {
-            obj = {
-              ...item,
-              path: val.path,
-              url: val.path,
-              version: val.version,
-              style: item.style
-            }
-          }
-        })
-        return obj
-      })
-      content.child = newChild
-      let yes = await this.$confirm('确定要直接更新最新组件并发布吗，此操作会立即同步用户端，请谨慎操作！')
-      if (!yes) return
-      Server({
-        url: 'editor/pages/history-publish',
-        method: 'post',
-        needLoading: true,
-        data: {
-          pageKey: row.key,
-          id: row.id,
-          projectId: row.projectId,
-          type: +row.type,
-          content: JSON.stringify(content)
-        }
-      }).then((response) => {
-        this.$message({type: 'success', message: '更新最新组件成功'})
-      })
-    },
-    open(item) {
-      window.open(this.getUrl(item))
-    },
-    preview(item) {
-      window.open(this.getUrl(item, true))
-    },
-    setting: function (item) {
-      this.$router.push({
-        path: '/page',
-        query: {
-          id: item.id,
-        },
-      })
-    },
-    getUrl: function (item, isClient) {
-      if (isClient) {
-        let url = `${config.VIEW_PATH}${item.key}`
-        var temp = new window.Image()
-        temp.src = url
-        return temp.src
-      } else {
-        return `${config.EDITOR_PATH}?key=${item.key}`
-      }
-    },
-    getqrUrl: function (item) {
-      return `https://www.liantu.com/api.php?text=${encodeURIComponent(
-        this.getUrl(item, 1)
-      )}`
-    },
     // 1启用、2禁用 0删除
     changeStatus: function (item) {
       var me = this
@@ -328,31 +150,6 @@ export default {
         })
       })
     },
-    // 删除
-    delet: function (item) {
-      var me = this
-      me.$confirm(`是否删除？`, {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'warning',
-      }).then(() => {
-        Server({
-          url: 'editor/pages/delete',
-          method: 'POST',
-          needLoading: true,
-          trimNull: false,
-          data: {
-            id: +item.id,
-          },
-        }).then(function (res) {
-          me.$message({
-            type: 'success',
-            message: '删除成功!',
-          })
-          me.detailInfo()
-        })
-      })
-    },
     // 详情页面挂载
     detailInfo() {
       Server({
@@ -362,56 +159,12 @@ export default {
         trimNull: false,
         data: {
           projectId: this.projectId,
+          status: 0
         },
       }).then((res) => {
         this.productList = res.data.data || []
       })
-    },
-    // 详情
-    detailPage: function (item) {},
-    newApi: function () {
-      this.openDialog({
-        name: 'DAddPage',
-        data: {
-          title: '添加页面',
-          form: {
-            projectId: this.$route.query.id,
-          },
-        },
-        methods: {},
-      })
-    },
-    copy: function (item) {
-      console.log(item)
-      Server({
-        url: 'editor/pages/detail',
-        method: 'post', // default
-        needLoading: false,
-        data: {
-          scene: 'copy',
-          pageKey: item.key,
-        },
-      }).then((respond) => {
-        console.log('bbb', respond.data.data)
-        const source = respond.data.data
-        this.openDialog({
-          name: 'DCopyPage',
-          data: {
-            title: '复制页面',
-            form: {
-              projectId: this.$route.query.id,
-              name: `复制${source.name}${Math.floor(Math.random() * 100)}`,
-              desc: `复制${source.desc}${Math.floor(Math.random() * 100)}`,
-              visibilitylevel: source.visibilitylevel,
-              content: source.content,
-              image: source.image,
-              keypre: item.keypre,
-            },
-          },
-          methods: {},
-        })
-      })
-    },
+    }
   },
 }
 </script>

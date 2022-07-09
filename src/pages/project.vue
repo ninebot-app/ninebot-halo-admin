@@ -8,6 +8,7 @@
             <el-tab-pane label="成员" name="member"></el-tab-pane>
             <el-tab-pane label="统计" name="report"></el-tab-pane>
             <el-tab-pane v-if="project.role<=1" label="设置" name="setting"></el-tab-pane>
+            <el-tab-pane v-if="project.role<=1 && admin == 1" label="已删除页面" name="delDoc"></el-tab-pane>
           </el-tabs>
         </div>
         <div class="controls">
@@ -28,6 +29,9 @@
         <div v-else class="content">
           <div v-if="activeName==='doc'">
             <c-doc :id="project.id"></c-doc>
+          </div>
+          <div v-if="activeName==='delDoc'">
+            <del-doc :id="project.id" :status="0"></del-doc>
           </div>
           <div v-if="activeName==='member'">
             <member :id="project.id"></member>
@@ -126,18 +130,20 @@
   import Member from './projects/members.vue'
   import CNew from './projects/CNew.vue'
   import CDoc from './projects/CDoc.vue'
+  import DelDoc from './projects/DelDoc.vue'
   import Report from './projects/data.vue'
 
   export default {
     mixins: [BasePage],
-    components: {Member, CNew, CDoc, Report},
+    components: {Member, CNew, CDoc, Report, DelDoc},
     name: 'project',
     data: function () {
       return {
         content: '',
         project: {},
         id: this.$route.query.id,
-        activeName: 'doc'
+        activeName: 'doc',
+        admin: this.$route.query.admin
       }
     },
     mounted: function () {
