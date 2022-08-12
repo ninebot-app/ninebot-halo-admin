@@ -9,7 +9,7 @@ require('./assets/style/base.css')
 
 Vue.use(ElementUI)
 Vue.config.devtools = !(process.env.NODE_ENV === 'production')
-
+console.log(7777)
 new Vue({
   el: '#app',
   render: h => h(Login)
