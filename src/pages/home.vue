@@ -266,7 +266,7 @@
 </template>
 
 <style lang="stylus" rel="stylesheet/stylus" scoped type="text/stylus">
-.mfullpage >>> .fp-tableCell {
+.mfullpage :deep() .fp-tableCell {
   height: 100%;
   vertical-align: inherit;
 }
@@ -282,7 +282,7 @@
   .cont_blank {
     flex: 1;
 
-    & >>> .blank-state-text {
+    & :deep() .blank-state-text {
       margin-bottom: 0;
     }
 

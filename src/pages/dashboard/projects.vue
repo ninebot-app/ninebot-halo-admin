@@ -105,7 +105,7 @@
   .project-name, .namespace-name {
     cursor: pointer;
   }
-  .projects-list-holder .el-collapse-item >>> .el-collapse-item__wrap {
+  .projects-list-holder .el-collapse-item :deep() .el-collapse-item__wrap {
     border 0
     overflow auto
   }
