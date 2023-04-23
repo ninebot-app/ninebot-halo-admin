@@ -137,8 +137,8 @@ export default {
         ko: '韩语',
         ru: '俄罗斯',
         it: '意大利',
-        zh_hk: '香港',
-        zh_tw: '台湾',
+        tr: '土耳其',
+        zhhant: '繁体中文'
       },
       langs: [
         'zh',
@@ -153,8 +153,8 @@ export default {
         'ko',
         'ru',
         'it',
-        'zh_hk',
-        'zh_tw',
+        'tr',
+        'zhhant'
       ],
       rules: {
         projectId: [
